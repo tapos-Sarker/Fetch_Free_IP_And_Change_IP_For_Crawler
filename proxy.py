@@ -1,22 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-import pyttsx3
 import requests
 
-e = pyttsx3.init()
-voices = e.getProperty('voices')
-e.setProperty('voice', voices[1].id)
-rate = e.getProperty('rate')
-e.setProperty('rate', rate-50)
 import time
-PROXY = "51.222.21.92:32769" # IP:PORT or HOST:PORT
+PROXY = "51.222.21.92:32769" # IP:PORT or HOST:PORT initial port to collect proxy
 
 class Checkingoutaproxy:
 
     def __init__(self):
-
+        # using selenium to find the ips
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--proxy-server=http://%s' % PROXY)
         self.chrome = webdriver.Chrome(chrome_options=chrome_options)
@@ -32,8 +24,10 @@ class Checkingoutaproxy:
         gettingColumn2 = gettingRow.find_elements(By.CSS_SELECTOR,'[role="row"] td:nth-child(2)')
         print(len(gettingColumn))
         print(type(gettingColumn))
-        # print(*map(str,gettingColumn), sep = "\n")
+
         i=0
+
+        # storing ips in a list
         for ip in gettingColumn:
             if i<len(gettingColumn):
                 m.append(ip.text + ":" + gettingColumn2[i + 1].text)
@@ -43,7 +37,7 @@ class Checkingoutaproxy:
         time.sleep(3)
         self.connectWithNewIP(m)
 
-
+    # method for checking the validity of the collected ips
     def connectWithNewIP(self,ips):
         for ip in ips:
             print("checking IP"+ip)
@@ -56,34 +50,13 @@ class Checkingoutaproxy:
                 break
             except Exception:
                 pass
-            # try:
-            #     # time.sleep(3)
-            #     print("checking > "+ip)
-            #     try:
-            #
-            #         # exit()
-            #     except Exception:
-            #         pass
-            # except Exception:
-            #     # self.chrome.quit()
-            #     pass
-
-        print('new ip:'+ip)
+        print('Success ip:'+ip)
         self.openWebsiteWithProxy(ip)
         self.chrome.quit()
 
-
+    # connecting the website with the new ip
     def openWebsiteWithProxy(self,ip):
-        e.say("I'm here")
-        e.runAndWait()
-        # try:
-        #     chrome_options = webdriver.ChromeOptions()
-        #     chrome_options.add_argument('--proxy-server=http://%s' % format(ip))
-        #     self.chrome = webdriver.Chrome(chrome_options=chrome_options)
-        #     self.chrome.maximize_window()
-        #     l = self.chrome.get('https://www.whatismyip.com/')
-        #     l = self.chrome.get('https://httpbin.org/ip')
-        #     print(l.json())
+
         try:
             webdriver.DesiredCapabilities.CHROME['proxy'] = {
                 "httpProxy": ip,
@@ -94,14 +67,8 @@ class Checkingoutaproxy:
             }
 
             webdriver.DesiredCapabilities.CHROME['acceptSslCerts'] = True
-            # self.chrome.get('https://www.whatismyip.com/')
-            # self.chrome.quit()
             self.chrome.get('https://whatismyipaddress.com/')
         except Exception:
-            # self.connectWithNewIP(self.m)
-        # self.chrome.maximize_window()
             pass
+
 test = Checkingoutaproxy()
-
-
-# chrome.get("http://whatismyipaddress.com")
